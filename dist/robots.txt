@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://www.twisttexinternational.com/sitemap.xml
