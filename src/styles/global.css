@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f7f4ed;
+  --color-parchment: #efeadd;
+  --color-sand: #e0d8c5;
+  --color-thread: #c9bfa8;
+
+  --color-ink: #23201a;
+  --color-night: #161e29;
+  --color-night-raised: #1e2938;
+  --color-mist: #cdc7b6;
+
+  --color-clay: #b0562f;
+  --color-clay-deep: #93451f;
+  --color-clay-soft: #d99267;
+
+  --font-display: "Fraunces", "Georgia", serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-panel: 0 24px 48px -24px rgb(22 30 41 / 0.35);
+  --shadow-card: 0 16px 40px -20px rgb(35 32 26 / 0.28);
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  @apply bg-paper font-sans text-ink antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: color-mix(in oklab, var(--color-clay) 24%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-clay);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.thread-grid {
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      rgb(246 243 236 / 0.05) 0 1px,
+      transparent 1px 88px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgb(246 243 236 / 0.04) 0 1px,
+      transparent 1px 88px
+    );
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
