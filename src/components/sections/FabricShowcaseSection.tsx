@@ -1,113 +1,46 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useTransform } from "framer-motion";
-import { MoveHorizontal } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
 import { SwatchVisual } from "../ui/SwatchVisual";
-import { fadeUp, staggerParent, VIEWPORT } from "../../lib/motion";
+import { Button } from "../ui/Button";
+import { EASE_OUT_EXPO, fadeUp, VIEWPORT } from "../../lib/motion";
 import { showcaseSwatches } from "../../data/products";
-import { cn } from "../../lib/utils";
+import { cn, scrollToSection } from "../../lib/utils";
+
+const AUTOPLAY_INTERVAL_MS = 5000;
 
 export function FabricShowcaseSection() {
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [dragging, setDragging] = useState(false);
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(false);
+  const reducedMotion = useReducedMotion();
+  const [activeId, setActiveId] = useState(showcaseSwatches[0].id);
+  const userLockedRef = useRef(false);
+  const hoveredRef = useRef(false);
 
-  const progress = useMotionValue(0);
-  const progressBarWidth = useTransform(progress, [0, 1], ["6%", "100%"]);
-
-  const updateScrollUi = useCallback(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    progress.set(max <= 0 ? 0 : Math.min(1, Math.max(0, el.scrollLeft / max)));
-    setAtStart(el.scrollLeft <= 4);
-    setAtEnd(max <= 0 || el.scrollLeft >= max - 4);
-  }, [progress]);
+  const activeIndex = Math.max(
+    0,
+    showcaseSwatches.findIndex((swatch) => swatch.id === activeId)
+  );
+  const active = showcaseSwatches[activeIndex];
 
   useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
+    if (reducedMotion) return;
 
-    updateScrollUi();
+    const timer = window.setInterval(() => {
+      if (userLockedRef.current || hoveredRef.current) return;
+      setActiveId((current) => {
+        const currentIndex = showcaseSwatches.findIndex((swatch) => swatch.id === current);
+        return showcaseSwatches[(currentIndex + 1) % showcaseSwatches.length].id;
+      });
+    }, AUTOPLAY_INTERVAL_MS);
 
-    let isDown = false;
-    let startX = 0;
-    let startScroll = 0;
+    return () => window.clearInterval(timer);
+  }, [reducedMotion]);
 
-    const onMouseDown = (event: MouseEvent) => {
-      if (event.button !== 0) return;
-      isDown = true;
-      startX = event.clientX;
-      startScroll = el.scrollLeft;
-      el.style.scrollSnapType = "none";
-      setDragging(true);
-    };
-
-    const onMouseMove = (event: MouseEvent) => {
-      if (!isDown) return;
-      el.scrollLeft = startScroll - (event.clientX - startX);
-    };
-
-    const onMouseUp = () => {
-      if (!isDown) return;
-      isDown = false;
-      setDragging(false);
-      window.setTimeout(() => {
-        el.style.scrollSnapType = "";
-      }, 80);
-    };
-
-    const onWheel = (event: WheelEvent) => {
-      const max = el.scrollWidth - el.clientWidth;
-      if (max <= 0) return;
-      if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-        const next = el.scrollLeft + event.deltaY;
-        const canConsume =
-          (event.deltaY < 0 && el.scrollLeft > 0) ||
-          (event.deltaY > 0 && next < max - 1);
-        if (canConsume) {
-          event.preventDefault();
-          el.style.scrollSnapType = "none";
-          el.scrollLeft = next;
-          window.clearTimeout(el.dataset.wheelTimer as unknown as number);
-          const timer = window.setTimeout(() => {
-            el.style.scrollSnapType = "";
-          }, 160);
-          el.dataset.wheelTimer = String(timer);
-        }
-      }
-    };
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        el.scrollBy({ left: 280, behavior: "smooth" });
-      } else if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        el.scrollBy({ left: -280, behavior: "smooth" });
-      }
-    };
-
-    el.addEventListener("scroll", updateScrollUi, { passive: true });
-    el.addEventListener("mousedown", onMouseDown);
-    el.addEventListener("wheel", onWheel, { passive: false });
-    el.addEventListener("keydown", onKeyDown);
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-    window.addEventListener("resize", updateScrollUi);
-
-    return () => {
-      el.removeEventListener("scroll", updateScrollUi);
-      el.removeEventListener("mousedown", onMouseDown);
-      el.removeEventListener("wheel", onWheel);
-      el.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-      window.removeEventListener("resize", updateScrollUi);
-    };
-  }, [updateScrollUi]);
+  const handleSelect = (id: string) => {
+    userLockedRef.current = true;
+    setActiveId(id);
+  };
 
   return (
     <section
@@ -131,107 +64,152 @@ export function FabricShowcaseSection() {
           lead="Surface, construction and handfeel — studied before it ever reaches your lab-dip review."
         />
 
-        <motion.p
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={VIEWPORT}
-          className="mx-auto mt-8 flex w-fit items-center gap-2.5 rounded-full border border-paper/15 px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.24em] text-mist"
-        >
-          <MoveHorizontal className="size-4" strokeWidth={1.75} />
-          {String(showcaseSwatches.length).padStart(2, "0")} materials — drag, scroll or
-          swipe
-        </motion.p>
-      </Container>
-
-      <div className="relative mt-12 sm:mt-14">
         <div
-          aria-hidden="true"
-          className={cn(
-            "pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-night to-transparent transition-opacity duration-400 sm:w-20",
-            atStart ? "opacity-0" : "opacity-100"
-          )}
-        />
-        <div
-          aria-hidden="true"
-          className={cn(
-            "pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-night to-transparent transition-opacity duration-400 sm:w-20",
-            atEnd ? "opacity-0" : "opacity-100"
-          )}
-        />
-
-        <motion.div
-          ref={scrollerRef}
-          role="region"
-          aria-label="Fabric swatch gallery"
-          tabIndex={0}
-          variants={staggerParent(0.07)}
-          initial="hidden"
-          whileInView="visible"
-          viewport={VIEWPORT}
-          className={cn(
-            "no-scrollbar relative flex select-none snap-x gap-5 overflow-x-auto px-5 pb-3 outline-offset-[-3px] sm:gap-6 sm:px-8",
-            dragging ? "cursor-grabbing" : "cursor-grab"
-          )}
+          className="mt-14 grid gap-10 lg:grid-cols-12 lg:items-stretch lg:gap-14"
+          onMouseEnter={() => {
+            hoveredRef.current = true;
+          }}
+          onMouseLeave={() => {
+            hoveredRef.current = false;
+          }}
         >
-          {showcaseSwatches.map((swatch, index) => (
-            <motion.article
-              key={swatch.id}
-              variants={fadeUp}
-              className={cn(
-                "group w-[72vw] max-w-[320px] shrink-0 snap-start sm:w-[44vw] lg:w-[29vw] xl:w-[23vw]",
-                index % 2 === 1 && "lg:translate-y-9"
-              )}
+          {/* Featured material stage */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT}
+            className="lg:col-span-7"
+          >
+            <div
+              role="tabpanel"
+              aria-label={`Material study: ${active.title}`}
+              className="relative h-[26rem] overflow-hidden rounded-xl shadow-panel ring-1 ring-paper/12 sm:h-[32rem] lg:h-full lg:min-h-[34rem]"
             >
-              <figure className="relative overflow-hidden rounded-xl shadow-panel ring-1 ring-paper/12 transition-all duration-500 group-hover:ring-paper/30">
-                <div className="relative aspect-[3/4] overflow-hidden">
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={active.id}
+                  className="absolute inset-0"
+                  initial={{ opacity: 0, scale: 1.04 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.65, ease: EASE_OUT_EXPO }}
+                >
                   <SwatchVisual
-                    pattern={swatch.pattern}
-                    palette={swatch.palette}
-                    className="h-full w-full transition-transform duration-[1400ms] ease-out motion-reduce:transition-none group-hover:scale-[1.05] motion-reduce:group-hover:scale-100"
+                    pattern={active.pattern}
+                    palette={active.palette}
+                    className="h-full w-full"
                   />
                   <div
                     aria-hidden="true"
-                    className="absolute inset-0 bg-gradient-to-t from-night/90 via-night/5 to-night/25"
+                    className="absolute inset-0 bg-gradient-to-t from-night/90 via-transparent to-night/20"
                   />
+                </motion.div>
+              </AnimatePresence>
 
-                  <div className="absolute inset-x-0 top-0 flex items-start justify-between p-4">
-                    <span className="font-display text-sm italic tracking-wide text-paper/70">
-                      /{String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="rounded-full border border-paper/20 bg-night/40 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-paper/85 backdrop-blur-sm">
-                      {swatch.weave}
-                    </span>
-                  </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${active.id}-meta`}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
+                  className="absolute inset-x-0 bottom-0 p-6 sm:p-8"
+                >
+                  <p className="font-display text-sm italic tracking-wide text-clay-soft">
+                    /{String(activeIndex + 1).padStart(2, "0")} — {active.weave}
+                  </p>
+                  <h3 className="mt-2 font-display text-3xl font-medium text-white sm:text-4xl">
+                    {active.title}
+                  </h3>
+                  <p className="mt-2 max-w-md text-sm leading-relaxed text-paper/80">
+                    {active.note}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
 
-                  <div className="absolute inset-x-0 bottom-0 p-5">
-                    <h3 className="font-display text-xl font-medium text-white sm:text-[1.35rem]">
-                      {swatch.title}
-                    </h3>
-                    <p className="mt-1 text-xs leading-relaxed text-paper/75 transition-all duration-500 lg:max-h-0 lg:opacity-0 lg:group-hover:max-h-16 lg:group-hover:opacity-100">
-                      {swatch.note}
-                    </p>
-                  </div>
-                </div>
-              </figure>
-            </motion.article>
-          ))}
-        </motion.div>
-
-        <Container>
-          <div className="mt-8 flex items-center gap-6">
-            <div aria-hidden="true" className="h-px flex-1 bg-paper/15">
-              <motion.div
-                className="h-full bg-clay"
-                style={{ width: progressBarWidth }}
-              />
+              <div className="absolute right-4 top-4 rounded-full border border-paper/20 bg-night/40 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.22em] text-paper/85 backdrop-blur-sm">
+                Material study
+              </div>
             </div>
-            <p className="shrink-0 text-[11px] font-bold uppercase tracking-[0.24em] text-mist">
-              Material index
+          </motion.div>
+
+          {/* Material index */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT}
+            transition={{ delay: 0.12 }}
+            className="flex flex-col justify-center lg:col-span-5"
+          >
+            <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.28em] text-clay-soft">
+              Material Index
             </p>
-          </div>
-        </Container>
-      </div>
+
+            <div role="tablist" aria-label="Select a material" className="flex flex-col">
+              {showcaseSwatches.map((swatch, index) => {
+                const isActive = swatch.id === active.id;
+                return (
+                  <button
+                    key={swatch.id}
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => handleSelect(swatch.id)}
+                    className={cn(
+                      "relative rounded-lg px-4 py-3.5 text-left transition-colors duration-300 sm:py-4",
+                      isActive ? "text-white" : "text-paper/65 hover:text-paper"
+                    )}
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="showcase-active-pill"
+                        transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
+                        className="absolute inset-0 rounded-lg bg-night-raised ring-1 ring-paper/10"
+                        aria-hidden="true"
+                      />
+                    )}
+
+                    <span className="relative z-10 flex items-center justify-between gap-4">
+                      <span className="flex items-baseline gap-4">
+                        <span className="text-[11px] font-bold tabular-nums tracking-widest text-clay-soft">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span className="font-display text-lg font-medium sm:text-xl">
+                          {swatch.title}
+                        </span>
+                      </span>
+                      <ArrowRight
+                        aria-hidden="true"
+                        className={cn(
+                          "size-4 shrink-0 transition-all duration-300",
+                          isActive ? "translate-x-0 text-clay-soft opacity-100" : "-translate-x-1 opacity-0"
+                        )}
+                        strokeWidth={2}
+                      />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-8 border-t border-paper/10 pt-6">
+              <p className="max-w-sm text-sm leading-relaxed text-mist">
+                Need a construction you don&rsquo;t see here? We develop against your
+                reference swatch, tech pack or target handfeel.
+              </p>
+              <Button
+                variant="outlineDark"
+                className="mt-5"
+                onClick={() => scrollToSection("contact")}
+              >
+                Request Full Library
+                <ArrowRight className="size-3.5" strokeWidth={2.25} />
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </Container>
     </section>
   );
 }
