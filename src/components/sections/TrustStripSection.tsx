@@ -1,9 +1,7 @@
 import { Container } from "../ui/Container";
-import { useTrustPoints } from "../../features/content/useSiteContent";
+import { trustPoints } from "../../data/capabilities";
 
 export function TrustStripSection() {
-  const { data: trustPoints } = useTrustPoints();
-
   return (
     <section aria-label="Capability highlights" className="border-b border-ink/10 bg-paper">
       <Container className="py-14 sm:py-16">

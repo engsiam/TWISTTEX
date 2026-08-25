@@ -1,7 +1,7 @@
 import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
 import { RevealGroup, RevealItem } from "../ui/Reveal";
-import { useGlobalReadiness } from "../../features/content/useSiteContent";
+import { globalReadiness } from "../../data/capabilities";
 
 function GlobeMark() {
   return (
@@ -29,8 +29,6 @@ function GlobeMark() {
 }
 
 export function GlobalReachSection() {
-  const { data: globalReadiness } = useGlobalReadiness();
-
   return (
     <section
       id="global"

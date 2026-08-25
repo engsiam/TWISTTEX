@@ -1,11 +1,9 @@
 import { Container } from "../ui/Container";
 import { RevealGroup, RevealItem } from "../ui/Reveal";
 import { SectionLabel } from "../ui/SectionLabel";
-import { useValues } from "../../features/content/useSiteContent";
+import { values } from "../../data/capabilities";
 
 export function ValuesSection() {
-  const { data: values } = useValues();
-
   return (
     <section
       className="bg-parchment py-24 sm:py-32"

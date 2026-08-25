@@ -2,10 +2,12 @@ import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, LoaderCircle, RotateCcw, TriangleAlert } from "lucide-react";
 import { Button } from "../../components/ui/Button";
-import { useEnquiryMutation } from "./useEnquiryMutation";
+import { submitEnquiry } from "../../lib/api";
 import { validateEnquiry } from "./validation";
 import type { EnquiryFormData, EnquiryFormErrors } from "../../types";
-import { useFabricCategories } from "../content/useSiteContent";
+import { fabricCategories } from "../../data/products";
+
+type FormStatus = "idle" | "submitting" | "success" | "error";
 
 const EMPTY_FORM: EnquiryFormData = {
   name: "",
@@ -34,8 +36,9 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 export function ContactForm() {
   const [form, setForm] = useState<EnquiryFormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<EnquiryFormErrors>({});
-  const mutation = useEnquiryMutation();
-  const { data: fabricCategories } = useFabricCategories();
+  const [status, setStatus] = useState<FormStatus>("idle");
+
+  const isPending = status === "submitting";
 
   const setField = (field: keyof EnquiryFormData) => (value: string) => {
     setForm((previous) => ({ ...previous, [field]: value }));
@@ -51,22 +54,25 @@ export function ContactForm() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (mutation.isPending) return;
+    if (status === "submitting") return;
 
     const nextErrors = validateEnquiry(form);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    mutation.mutate(form);
+    setStatus("submitting");
+    submitEnquiry(form)
+      .then(() => setStatus("success"))
+      .catch(() => setStatus("error"));
   };
 
   const handleReset = () => {
     setForm(EMPTY_FORM);
     setErrors({});
-    mutation.reset();
+    setStatus("idle");
   };
 
-  if (mutation.isSuccess) {
+  if (status === "success") {
     return (
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -247,7 +253,7 @@ export function ContactForm() {
       </div>
 
       <AnimatePresence>
-        {mutation.isError && (
+        {status === "error" && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
@@ -272,10 +278,10 @@ export function ContactForm() {
         type="submit"
         size="lg"
         className="mt-7 w-full sm:w-auto"
-        disabled={mutation.isPending}
+        disabled={isPending}
         ariaLabel="Submit fabric enquiry"
       >
-        {mutation.isPending ? (
+        {isPending ? (
           <>
             <LoaderCircle className="size-4 animate-spin" strokeWidth={2.25} />
             Sending…

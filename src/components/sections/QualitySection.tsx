@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
 import { RevealGroup, RevealItem } from "../ui/Reveal";
-import { useQualityPractices } from "../../features/content/useSiteContent";
+import { qualityPractices } from "../../data/capabilities";
 
 const inspectionChecklist = [
   "Construction & weight vs. approved standard",
@@ -12,8 +12,6 @@ const inspectionChecklist = [
 ];
 
 export function QualitySection() {
-  const { data: qualityPractices } = useQualityPractices();
-
   return (
     <section
       id="quality"

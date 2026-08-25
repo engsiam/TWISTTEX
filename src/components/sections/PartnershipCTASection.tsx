@@ -33,7 +33,7 @@ export function PartnershipCTASection() {
           initial="hidden"
           whileInView="visible"
           viewport={VIEWPORT}
-          className="max-w-3xl"
+          className="mx-auto flex max-w-3xl flex-col items-center text-center"
         >
           <h2
             id="cta-heading"
@@ -46,7 +46,7 @@ export function PartnershipCTASection() {
             Send us your target construction, a reference swatch, or simply the problem
             you are trying to solve. A sourcing specialist will take it from there.
           </p>
-          <div className="mt-10 flex flex-wrap items-center gap-4">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Button variant="paper" size="lg" onClick={() => scrollToSection("contact")}>
               Start an Enquiry
               <ArrowRight className="size-4" strokeWidth={2.25} />

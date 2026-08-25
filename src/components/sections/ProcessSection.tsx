@@ -2,10 +2,9 @@ import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
-import { useProcessSteps } from "../../features/content/useSiteContent";
+import { processSteps } from "../../data/process";
 
 export function ProcessSection() {
-  const { data: processSteps } = useProcessSteps();
   const timelineRef = useRef<HTMLOListElement>(null);
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({

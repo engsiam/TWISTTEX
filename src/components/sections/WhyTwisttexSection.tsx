@@ -2,11 +2,9 @@ import { motion } from "framer-motion";
 import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
 import { fadeUp, VIEWPORT } from "../../lib/motion";
-import { useWhyPoints } from "../../features/content/useSiteContent";
+import { whyPoints } from "../../data/capabilities";
 
 export function WhyTwisttexSection() {
-  const { data: whyPoints } = useWhyPoints();
-
   return (
     <section
       id="why-twisttex"

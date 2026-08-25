@@ -4,12 +4,10 @@ import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
 import { SwatchVisual } from "../ui/SwatchVisual";
 import { fadeUp, VIEWPORT } from "../../lib/motion";
-import { useFabricCategories } from "../../features/content/useSiteContent";
+import { fabricCategories } from "../../data/products";
 import { cn } from "../../lib/utils";
 
 export function FabricCategoriesSection() {
-  const { data: fabricCategories } = useFabricCategories();
-
   return (
     <section
       id="fabrics"
