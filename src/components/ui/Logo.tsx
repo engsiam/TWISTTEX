@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { cn } from "../../lib/utils";
 
 interface LogoProps {
@@ -7,27 +8,21 @@ interface LogoProps {
 
 export function Logo({ tone = "dark", className }: LogoProps) {
   return (
-    <a
-      href="#top"
-      className={cn("group inline-flex flex-col leading-none", className)}
+    <Link
+      to="/"
+      className={cn("group inline-flex items-center gap-2", className)}
       aria-label="Twisttex International — back to top"
     >
-      <span
+      <img
+        src="/logo.png"
+        alt="Twisttex International"
         className={cn(
-          "font-display text-[1.35rem] font-semibold tracking-[0.08em]",
-          tone === "light" ? "text-paper" : "text-ink"
+          "h-14 w-auto sm:h-16 lg:h-20",
+          tone === "light" ? "brightness-0 invert" : ""
         )}
-      >
-        TWISTTEX
-      </span>
-      <span
-        className={cn(
-          "mt-1 text-[9px] font-bold uppercase tracking-[0.42em]",
-          tone === "light" ? "text-mist" : "text-clay"
-        )}
-      >
-        International
-      </span>
-    </a>
+        width={280}
+        height={80}
+      />
+    </Link>
   );
 }

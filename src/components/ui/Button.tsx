@@ -13,8 +13,8 @@ const variantClasses: Record<ButtonVariant, string> = {
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  md: "px-6 py-3 text-[11px]",
-  lg: "px-7 py-3.5 text-xs",
+  md: "px-4 py-2 text-[10px] sm:px-6 sm:py-3 sm:text-[11px]",
+  lg: "px-5 py-2.5 text-[10px] sm:px-7 sm:py-3.5 sm:text-xs",
 };
 
 interface ButtonProps {
@@ -41,8 +41,8 @@ export function Button({
   disabled = false,
 }: ButtonProps) {
   const classes = cn(
-    "inline-flex items-center justify-center gap-2.5 rounded-full font-semibold uppercase tracking-[0.16em]",
-    "transition-colors duration-300 ease-out disabled:pointer-events-none disabled:opacity-60",
+    "inline-flex items-center justify-center gap-2 rounded-full font-semibold uppercase tracking-[0.14em]",
+    "transition-all duration-300 ease-out disabled:pointer-events-none disabled:opacity-60",
     variantClasses[variant],
     sizeClasses[size],
     className

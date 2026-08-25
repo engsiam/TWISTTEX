@@ -11,9 +11,13 @@ export function Footer() {
       <Container className="py-16 sm:py-20">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
-            <span className="font-display text-2xl font-semibold tracking-[0.08em]">
-              TWISTTEX
-            </span>
+            <img
+              src="/logo.png"
+              alt="Twisttex International"
+              className="h-12 w-auto brightness-0 invert sm:h-14"
+              width={200}
+              height={56}
+            />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-mist">
               {company.positioning} We source, develop and inspect fabrics so apparel
               businesses can build collections with confidence.

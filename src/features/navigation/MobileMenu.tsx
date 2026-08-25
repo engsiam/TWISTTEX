@@ -223,7 +223,7 @@ export function MobileMenu() {
             <button
               type="button"
               onClick={() => navigateTo("contact")}
-              className="mt-6 w-full rounded-full bg-clay py-4 text-xs font-bold uppercase tracking-[0.18em] text-paper transition-colors duration-300 active:bg-clay-deep"
+              className="mt-6 w-full rounded-full bg-clay py-3.5 text-[11px] font-bold uppercase tracking-[0.16em] text-paper transition-colors duration-300 active:bg-clay-deep sm:py-4 sm:text-xs"
             >
               Start an Enquiry
             </button>

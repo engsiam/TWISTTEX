@@ -23,7 +23,7 @@ export function Header() {
           : "border-b border-transparent bg-transparent text-paper"
       )}
     >
-      <div className="mx-auto flex h-[4.75rem] w-full max-w-[76rem] items-center justify-between px-5 sm:px-8">
+      <div className="mx-auto flex h-20 w-full max-w-[76rem] items-center justify-between px-5 sm:h-24 sm:px-8">
         <Logo tone={solid ? "dark" : "light"} />
 
         <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">
@@ -73,12 +73,12 @@ export function Header() {
             aria-controls="mobile-nav-overlay"
             aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
             className={cn(
-              "relative z-[90] flex size-11 items-center justify-center rounded-full border transition-colors duration-300 lg:hidden",
+              "relative z-[90] flex size-9 items-center justify-center rounded-lg border transition-colors duration-300 sm:size-10 sm:rounded-xl lg:hidden",
               mobileNavOpen
                 ? "border-paper/25 bg-paper/10 text-paper backdrop-blur-sm"
                 : solid
-                  ? "border-ink/25 text-ink"
-                  : "border-paper/30 text-paper"
+                  ? "border-ink/20 text-ink"
+                  : "border-paper/25 text-paper"
             )}
           >
             <span aria-hidden="true" className="relative block h-[10px] w-[22px]">
