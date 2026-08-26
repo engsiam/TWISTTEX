@@ -1,9 +1,12 @@
 import { Outlet } from "@tanstack/react-router";
 import { Header } from "../../features/navigation/Header";
 import { MobileMenu } from "../../features/navigation/MobileMenu";
+import { useSmoothScroll } from "../../lib/smoothScroll";
 import { Footer } from "./Footer";
 
 export function RootLayout() {
+  useSmoothScroll();
+
   return (
     <>
       <a
