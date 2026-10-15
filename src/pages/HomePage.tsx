@@ -9,7 +9,6 @@ import { QualitySection } from "../components/sections/QualitySection";
 import { TradeSection } from "../components/sections/TradeSection";
 import { GlobalReachSection } from "../components/sections/GlobalReachSection";
 import { ValuesSection } from "../components/sections/ValuesSection";
-import { PartnershipCTASection } from "../components/sections/PartnershipCTASection";
 import { ContactSection } from "../components/sections/ContactSection";
 
 export function HomePage() {
@@ -26,7 +25,6 @@ export function HomePage() {
       <TradeSection />
       <GlobalReachSection />
       <ValuesSection />
-      <PartnershipCTASection />
       <ContactSection />
     </>
   );
