@@ -1,6 +1,8 @@
+import { motion } from "framer-motion";
 import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { contact, company, navLinks } from "../../data/company";
 import { scrollToSection } from "../../lib/utils";
+import { fadeUp, staggerParent, VIEWPORT } from "../../lib/motion";
 import { Container } from "../ui/Container";
 
 export function Footer() {
@@ -8,9 +10,15 @@ export function Footer() {
 
   return (
     <footer className="bg-night text-paper">
-      <Container className="py-16 sm:py-20">
-        <div className="grid gap-12 md:grid-cols-12">
-          <div className="md:col-span-5">
+      <Container className="py-10 sm:py-12">
+        <motion.div
+          variants={staggerParent(0.1)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={VIEWPORT}
+          className="grid gap-10 md:grid-cols-12"
+        >
+          <motion.div variants={fadeUp} className="md:col-span-5">
             <img
               src="/logo.png"
               alt="Twisttex International"
@@ -22,9 +30,9 @@ export function Footer() {
               {company.positioning} We source, develop and inspect fabrics so apparel
               businesses can build collections with confidence.
             </p>
-          </div>
+          </motion.div>
 
-          <nav className="md:col-span-3" aria-label="Footer">
+          <motion.nav variants={fadeUp} className="md:col-span-3" aria-label="Footer">
             <h3 className="text-[11px] font-bold uppercase tracking-[0.26em] text-clay-soft">
               Explore
             </h3>
@@ -41,9 +49,9 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </nav>
+          </motion.nav>
 
-          <div className="md:col-span-4">
+          <motion.div variants={fadeUp} className="md:col-span-4">
             <h3 className="text-[11px] font-bold uppercase tracking-[0.26em] text-clay-soft">
               Contact
             </h3>
@@ -77,10 +85,10 @@ export function Footer() {
               Request a Quote
               <ArrowUpRight className="size-3.5" strokeWidth={2} />
             </a>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="mt-14 flex flex-col gap-4 border-t border-paper/10 pt-7 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-4 border-t border-paper/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-mist">
             © {year} {company.name}. All rights reserved.
           </p>

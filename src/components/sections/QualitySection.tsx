@@ -2,7 +2,10 @@ import { Check } from "lucide-react";
 import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
 import { RevealGroup, RevealItem } from "../ui/Reveal";
+import { EditableImage } from "../ui/EditableImage";
+import { Parallax } from "../ui/Parallax";
 import { qualityPractices } from "../../data/capabilities";
+import { certifications } from "../../data/trade";
 
 const inspectionChecklist = [
   "Construction & weight vs. approved standard",
@@ -47,9 +50,19 @@ export function QualitySection() {
               ))}
             </RevealGroup>
 
-            <RevealItem className="mt-10 inline-flex items-center gap-3 rounded-full border border-dashed border-clay/50 bg-clay/5 px-5 py-2.5">
+            <RevealItem className="mt-10 inline-flex flex-wrap items-center gap-2 rounded-2xl border border-dashed border-clay/50 bg-clay/5 px-5 py-3">
               <span className="text-xs font-semibold tracking-wide text-clay-deep">
-                Certification & test documentation — available on request per programme.
+                Certification & test documentation — available on request per programme:
+              </span>
+              <span className="flex flex-wrap gap-1.5">
+                {certifications.map((cert) => (
+                  <span
+                    key={cert}
+                    className="rounded bg-white px-2 py-0.5 text-[10px] font-bold tracking-wider text-ink shadow-sm ring-1 ring-ink/10"
+                  >
+                    {cert}
+                  </span>
+                ))}
               </span>
             </RevealItem>
           </div>
@@ -57,22 +70,21 @@ export function QualitySection() {
           <div className="lg:col-span-6">
             <RevealGroup className="relative lg:pl-8">
               <RevealItem className="overflow-hidden rounded-xl shadow-card">
-                <figure>
-                  <div className="relative aspect-[5/4] overflow-hidden rounded-xl bg-night-raised">
-                    <div
-                      aria-hidden="true"
-                      className="thread-grid absolute inset-0 opacity-60"
+                <Parallax distance={60}>
+                  <figure>
+                    {/* Real-photo slot: /public/images/mill-greige-rolls.jpg (client to share) */}
+                    <EditableImage
+                      src="/images/mill-greige-rolls.jpg"
+                      alt="Greige fabric rolls at a partner mill"
+                      pattern="plain"
+                      palette={{ base: "#D8CFB8", warp: "#E4DBC4", weft: "#C2B498" }}
+                      className="aspect-[5/4] w-full rounded-xl"
                     />
-                    <div className="relative flex h-full flex-col justify-between p-7 sm:p-9">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-clay-soft">
-                        Pre-shipment Inspection
-                      </p>
-                      <p className="font-display text-2xl leading-snug font-medium text-balance text-paper sm:text-[1.75rem]">
-                        No roll leaves without passing the standard you approved.
-                      </p>
-                    </div>
-                  </div>
-                </figure>
+                    <figcaption className="bg-night-raised px-5 py-3 text-xs leading-relaxed text-mist">
+                      Mill greige stock — real partner-mill photos replace this slot when shared.
+                    </figcaption>
+                  </figure>
+                </Parallax>
               </RevealItem>
 
               <RevealItem className="relative z-10 -mt-14 ml-auto w-[88%] sm:w-[78%]">

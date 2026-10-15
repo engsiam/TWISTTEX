@@ -1,7 +1,9 @@
+import { motion } from "framer-motion";
 import { Mail, MessageCircle, MapPin } from "lucide-react";
 import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
 import { RevealGroup, RevealItem } from "../ui/Reveal";
+import { fadeUp, VIEWPORT } from "../../lib/motion";
 import { ContactForm } from "../../features/enquiry/ContactForm";
 import { contact } from "../../data/company";
 
@@ -93,9 +95,15 @@ export function ContactSection() {
             </RevealGroup>
           </div>
 
-          <div className="lg:col-span-7">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT}
+            className="lg:col-span-7"
+          >
             <ContactForm />
-          </div>
+          </motion.div>
         </div>
       </Container>
     </section>

@@ -56,7 +56,7 @@ export const whyPoints: WhyPoint[] = [
     index: "01",
     title: "Quality-conscious sourcing",
     description:
-      "We select mills and suppliers against your construction, weight and finish targets — not whatever is easiest to ship.",
+      "We select mills and suppliers to match your construction, weight and finish targets — not whatever is easiest to ship.",
   },
   {
     id: "communication",

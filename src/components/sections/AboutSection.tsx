@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
-import { SwatchVisual } from "../ui/SwatchVisual";
+import { EditableImage } from "../ui/EditableImage";
+import { Parallax } from "../ui/Parallax";
 import { RevealGroup, RevealItem } from "../ui/Reveal";
-import { maskReveal, VIEWPORT } from "../../lib/motion";
 import { scrollToSection } from "../../lib/utils";
 
 const aboutPoints = [
@@ -12,7 +12,7 @@ const aboutPoints = [
     id: "network",
     title: "A sourcing network built on standards",
     description:
-      "Mills and suppliers are chosen against your construction, weight and finish targets — then held to them.",
+      "Mills and suppliers are selected to match your construction, weight and finish targets — then held to them.",
   },
   {
     id: "development",
@@ -22,9 +22,9 @@ const aboutPoints = [
   },
   {
     id: "relationship",
-    title: "Partnership over transactions",
+    title: "Built for new and current buyers",
     description:
-      "Transparent costing and dependable timelines designed for buyers who reorder season after season.",
+      "Transparent costing and dependable timelines for buyers who reorder season after season.",
   },
 ];
 
@@ -58,18 +58,15 @@ export function AboutSection() {
           </div>
 
           <div className="lg:col-span-7">
-            <motion.div
-              variants={maskReveal}
-              initial="hidden"
-              whileInView="visible"
-              viewport={VIEWPORT}
-              className="relative"
-            >
+            <Parallax distance={50} className="relative">
               <figure className="overflow-hidden rounded-xl shadow-card">
-                <SwatchVisual
+                {/* Real-photo slot: /public/images/about-mill.jpg */}
+                <EditableImage
+                  src="/images/about-mill.jpg"
+                  alt="Fabric rolls at a partner mill"
                   pattern="plain"
                   palette={{ base: "#EAE2CF", warp: "#F6F1E3", weft: "#D9CDB2" }}
-                  className="aspect-[4/3] w-full"
+                  className="aspect-[4/3] w-full rounded-xl"
                 />
               </figure>
 
@@ -77,17 +74,20 @@ export function AboutSection() {
                 initial={false}
                 className="absolute -bottom-10 -left-4 w-[42%] overflow-hidden rounded-lg shadow-panel ring-4 ring-paper sm:-left-10"
               >
-                <SwatchVisual
+                {/* Real-photo slot: /public/images/about-fabric-closeup.jpg */}
+                <EditableImage
+                  src="/images/about-fabric-closeup.jpg"
+                  alt="Close-up of fabric texture"
                   pattern="twill"
                   palette={{ base: "#33475E", warp: "#42586F", weft: "#232F3E" }}
-                  className="aspect-square w-full"
+                  className="aspect-square w-full rounded-lg"
                 />
               </motion.figure>
 
               <div className="absolute -top-5 right-4 rounded-full bg-night px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.22em] text-paper shadow-panel sm:right-10">
                 Sourcing-led quality control
               </div>
-            </motion.div>
+            </Parallax>
 
             <blockquote className="mt-20 max-w-lg border-l-2 border-clay pl-6 sm:ml-auto sm:pl-8">
               <p className="font-display text-2xl leading-snug font-medium text-balance italic sm:text-[1.7rem]">
