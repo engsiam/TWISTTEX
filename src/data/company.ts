@@ -24,6 +24,7 @@ export const navLinks: NavLink[] = [
   { id: "fabrics", label: "Fabrics" },
   { id: "process", label: "Process" },
   { id: "quality", label: "Quality" },
+  { id: "trade", label: "Trade" },
   { id: "global", label: "Global" },
   { id: "contact", label: "Contact" },
 ];

@@ -2,38 +2,10 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { useRef } from "react";
 import { Button } from "../ui/Button";
 import { SectionLabel } from "../ui/SectionLabel";
-import { SwatchVisual } from "../ui/SwatchVisual";
+import { EditableImage } from "../ui/EditableImage";
 import { Container } from "../ui/Container";
 import { EASE_OUT_EXPO, staggerParent } from "../../lib/motion";
 import { scrollToSection } from "../../lib/utils";
-
-const heroProofs = [
-  { title: "Woven & knit", caption: "Multi-category sourcing" },
-  { title: "Quality-first", caption: "Inspection at every stage" },
-  { title: "Buyer-aligned", caption: "Clear, responsive communication" },
-  { title: "Export-ready", caption: "Documentation & logistics support" },
-];
-
-const heroSwatches = [
-  {
-    id: "hero-denim",
-    pattern: "twill" as const,
-    palette: { base: "#33475E", warp: "#42586F", weft: "#232F3E" },
-    className: "left-0 top-6 w-[58%] rotate-[-5deg]",
-  },
-  {
-    id: "hero-linen",
-    pattern: "basket" as const,
-    palette: { base: "#E0D2B4", warp: "#EEE2C8", weft: "#CDBA92" },
-    className: "right-[2%] top-0 w-[52%] rotate-[3deg]",
-  },
-  {
-    id: "hero-clay",
-    pattern: "herringbone" as const,
-    palette: { base: "#B0562F", warp: "#C26940", weft: "#8F4523" },
-    className: "bottom-0 left-[16%] w-[56%] rotate-[-2deg]",
-  },
-];
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -121,24 +93,6 @@ export function HeroSection() {
                 Explore Fabrics
               </Button>
             </motion.div>
-
-            <motion.dl
-              variants={{
-                hidden: { opacity: 0 },
-                visible: {
-                  opacity: 1,
-                  transition: { duration: 1, delay: 0.35 },
-                },
-              }}
-              className="mt-16 grid grid-cols-2 gap-x-6 gap-y-7 border-t border-paper/15 pt-8 md:grid-cols-4"
-            >
-              {heroProofs.map((proof) => (
-                <div key={proof.title}>
-                  <dt className="text-sm font-bold tracking-wide">{proof.title}</dt>
-                  <dd className="mt-1 text-xs leading-relaxed text-mist">{proof.caption}</dd>
-                </div>
-              ))}
-            </motion.dl>
           </motion.div>
 
           <motion.div
@@ -148,14 +102,38 @@ export function HeroSection() {
             transition={{ duration: 1.2, ease: EASE_OUT_EXPO, delay: 0.25 }}
             className="relative mx-auto aspect-[4/5] w-full max-w-md lg:col-span-5 lg:max-w-none"
           >
-            {heroSwatches.map((swatch) => (
-              <div
-                key={swatch.id}
-                className={`absolute overflow-hidden rounded-lg shadow-panel ring-1 ring-paper/15 ${swatch.className}`}
-              >
-                <SwatchVisual pattern={swatch.pattern} palette={swatch.palette} className="h-full w-full" />
-              </div>
-            ))}
+            {/* Layered fabric collage — each slot loads a real photo when
+                /public/images/hero-*.jpg exists, weave fallback otherwise */}
+            <div className="absolute left-0 top-6 w-[58%] rotate-[-5deg] overflow-hidden rounded-lg shadow-panel ring-1 ring-paper/15">
+              <EditableImage
+                src="/images/hero-denim.jpg"
+                alt="Denim fabric close-up"
+                pattern="twill"
+                palette={{ base: "#33475E", warp: "#42586F", weft: "#232F3E" }}
+                eager
+                className="aspect-[3/4] w-full"
+              />
+            </div>
+            <div className="absolute right-[2%] top-0 w-[52%] rotate-[3deg] overflow-hidden rounded-lg shadow-panel ring-1 ring-paper/15">
+              <EditableImage
+                src="/images/hero-linen.jpg"
+                alt="Linen fabric texture"
+                pattern="basket"
+                palette={{ base: "#E0D2B4", warp: "#EEE2C8", weft: "#CDBA92" }}
+                eager
+                className="aspect-[3/4] w-full"
+              />
+            </div>
+            <div className="absolute bottom-0 left-[16%] w-[56%] rotate-[-2deg] overflow-hidden rounded-lg shadow-panel ring-1 ring-paper/15">
+              <EditableImage
+                src="/images/hero-fabric.jpg"
+                alt="Close-up of sourced fabric"
+                pattern="herringbone"
+                palette={{ base: "#B0562F", warp: "#C26940", weft: "#8F4523" }}
+                eager
+                className="aspect-[4/3] w-full"
+              />
+            </div>
             <div className="absolute -right-3 bottom-10 rounded-full bg-paper px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.22em] text-ink shadow-panel sm:-right-6">
               Cotton · Linen · Denim · Knits
             </div>

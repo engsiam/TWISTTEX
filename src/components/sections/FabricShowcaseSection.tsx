@@ -11,7 +11,7 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
 import { SectionLabel } from "../ui/SectionLabel";
-import { SwatchVisual } from "../ui/SwatchVisual";
+import { EditableImage } from "../ui/EditableImage";
 import { Button } from "../ui/Button";
 import { EASE_OUT_EXPO } from "../../lib/motion";
 import { showcaseSwatches } from "../../data/products";
@@ -46,9 +46,11 @@ function ShowcaseCard({
 }) {
   return (
     <article className="group relative h-[26rem] w-[20rem] shrink-0 overflow-hidden rounded-xl border border-paper/10 bg-night-raised shadow-panel transition-transform duration-300 hover:-translate-y-1.5 sm:h-[28rem] sm:w-[23rem]">
-      {/* Procedural weave visual */}
+      {/* Real photo when /public/images/<id>.jpg exists, weave fallback otherwise */}
       <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.04]">
-        <SwatchVisual
+        <EditableImage
+          src={swatch.image}
+          alt={`${swatch.title} fabric close-up`}
           pattern={swatch.pattern}
           palette={swatch.palette}
           className="h-full w-full"
@@ -312,7 +314,9 @@ export function FabricShowcaseSection() {
               }}
               className="relative h-80 overflow-hidden rounded-xl border border-paper/10 bg-night-raised shadow-panel"
             >
-              <SwatchVisual
+              <EditableImage
+                src={swatch.image}
+                alt={`${swatch.title} fabric close-up`}
                 pattern={swatch.pattern}
                 palette={swatch.palette}
                 className="absolute inset-0 h-full w-full"

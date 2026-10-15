@@ -1,6 +1,7 @@
 import { Container } from "../ui/Container";
 import { SectionHeading } from "../ui/SectionHeading";
 import { RevealGroup, RevealItem } from "../ui/Reveal";
+import { Parallax } from "../ui/Parallax";
 import { globalReadiness } from "../../data/capabilities";
 
 function GlobeMark() {
@@ -38,7 +39,9 @@ export function GlobalReachSection() {
       <Container>
         <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
           <div className="order-2 flex justify-center lg:order-1 lg:col-span-5">
-            <GlobeMark />
+            <Parallax distance={70}>
+              <GlobeMark />
+            </Parallax>
           </div>
 
           <div className="order-1 lg:order-2 lg:col-span-7">
@@ -64,8 +67,9 @@ export function GlobalReachSection() {
 
             <RevealItem className="mt-10 max-w-xl">
               <p className="border-l-2 border-clay pl-5 text-sm leading-relaxed text-mist">
-                Buyer programmes are active across established textile trade lanes. Ask us
-                about current coverage for your market — we will give you a straight answer.
+                Mill regions across China, coordinated through Hong Kong logistics —
+                with export documentation prepared correctly the first time. Full
+                buyer, sourcing and payment detail lives in the Trade section above.
               </p>
             </RevealItem>
           </div>

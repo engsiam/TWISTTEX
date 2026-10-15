@@ -19,6 +19,14 @@ export interface FabricCategory {
   palette: SwatchPalette;
   span: string;
   aspect: string;
+  /** Inline sub-types shown as chips — keeps the page scannable instead of textbook-like. */
+  tags: string[];
+  /** Tags that are planned but not offered yet (rendered with a "Soon" badge). */
+  futureTags?: string[];
+  /** Small corner badge, e.g. "We also do", "Certified", "One-line". */
+  badge?: string;
+  /** Certification logos / text badges shown on the card (sustainable only). */
+  certifications?: string[];
 }
 
 export interface ShowcaseSwatch {
@@ -28,6 +36,8 @@ export interface ShowcaseSwatch {
   weave: string;
   pattern: WeavePattern;
   palette: SwatchPalette;
+  /** Real photo path, e.g. "/images/showcase-cotton-poplin.jpg". Falls back to pattern when missing. */
+  image?: string;
 }
 
 export interface TrustPoint {

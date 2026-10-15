@@ -20,9 +20,9 @@ const EMPTY_FORM: EnquiryFormData = {
 };
 
 const inputClasses =
-  "w-full rounded-lg border border-ink/15 bg-paper/60 px-4 py-3 text-sm text-ink placeholder:text-ink/40 transition-colors focus:border-clay focus:bg-white focus:outline-none";
+  "w-full rounded-lg border border-ink/15 bg-paper/60 px-4 py-3 text-base leading-relaxed text-ink placeholder:text-ink/40 transition-colors focus:border-clay focus:bg-white focus:outline-none sm:text-[15px]";
 
-const labelClasses = "mb-1.5 block text-xs font-bold tracking-wide text-ink";
+const labelClasses = "mb-2 block text-[13px] leading-snug font-bold tracking-wide text-ink";
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
@@ -36,18 +36,40 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 export function ContactForm() {
   const [form, setForm] = useState<EnquiryFormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<EnquiryFormErrors>({});
+  const [touched, setTouched] = useState<
+    Partial<Record<keyof EnquiryFormData, boolean>>
+  >({});
   const [status, setStatus] = useState<FormStatus>("idle");
 
   const isPending = status === "submitting";
 
+  /** Errors are only shown for fields the user has interacted with
+   *  (blurred) or after a submit attempt — never on initial load. */
+  const visibleErrors: EnquiryFormErrors = {};
+  (Object.keys(errors) as Array<keyof EnquiryFormData>).forEach((field) => {
+    if (touched[field]) {
+      visibleErrors[field] = errors[field];
+    }
+  });
+
   const setField = (field: keyof EnquiryFormData) => (value: string) => {
-    setForm((previous) => ({ ...previous, [field]: value }));
-    if (errors[field]) {
+    const nextForm = { ...form, [field]: value };
+    setForm(nextForm);
+    // Live re-validate fields the user has already interacted with so
+    // messages update/disappear as the field is corrected.
+    if (touched[field]) {
+      const fieldErrors = validateEnquiry(nextForm);
+      setErrors((previous) => ({
+        ...previous,
+        [field]: fieldErrors[field],
+      }));
+    } else if (errors[field]) {
       setErrors((previous) => ({ ...previous, [field]: undefined }));
     }
   };
 
   const handleBlur = (field: keyof EnquiryFormData) => () => {
+    setTouched((previous) => ({ ...previous, [field]: true }));
     const fieldErrors = validateEnquiry(form);
     setErrors((previous) => ({ ...previous, [field]: fieldErrors[field] }));
   };
@@ -58,7 +80,37 @@ export function ContactForm() {
 
     const nextErrors = validateEnquiry(form);
     setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
+    // Mark every field as touched so all relevant errors appear after
+    // an invalid submit.
+    setTouched({
+      name: true,
+      company: true,
+      email: true,
+      phone: true,
+      country: true,
+      category: true,
+      message: true,
+    });
+    if (Object.keys(nextErrors).length > 0) {
+      // Move focus to the first invalid field for keyboard users.
+      const firstInvalid = (
+        ["name", "email", "phone", "category", "message"] as Array<
+          keyof EnquiryFormData
+        >
+      ).find((field) => nextErrors[field]);
+      if (firstInvalid) {
+        document
+          .getElementById(
+            firstInvalid === "message"
+              ? "enquiry-message"
+              : firstInvalid === "category"
+                ? "enquiry-category"
+                : `enquiry-${firstInvalid}`,
+          )
+          ?.focus({ preventScroll: false });
+      }
+      return;
+    }
 
     setStatus("submitting");
     submitEnquiry(form)
@@ -69,6 +121,7 @@ export function ContactForm() {
   const handleReset = () => {
     setForm(EMPTY_FORM);
     setErrors({});
+    setTouched({});
     setStatus("idle");
   };
 
@@ -98,9 +151,17 @@ export function ContactForm() {
     <form
       onSubmit={handleSubmit}
       noValidate
-      aria-label="Fabric enquiry form"
-      className="rounded-xl border border-ink/10 bg-white p-7 shadow-card sm:p-9"
+      aria-labelledby="enquiry-form-heading"
+      className="rounded-xl border border-ink/10 bg-white p-6 shadow-card sm:p-9"
     >
+      <div className="mb-7">
+        <h3
+          id="enquiry-form-heading"
+          className="font-display text-2xl font-medium tracking-tight text-ink sm:text-[1.75rem]"
+        >
+          Tell us what you need.
+        </h3>
+      </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="enquiry-name" className={labelClasses}>
@@ -115,12 +176,12 @@ export function ContactForm() {
             value={form.name}
             onChange={(event) => setField("name")(event.target.value)}
             onBlur={handleBlur("name")}
-            aria-invalid={Boolean(errors.name)}
-            aria-describedby={errors.name ? "enquiry-name-error" : undefined}
+            aria-invalid={Boolean(visibleErrors.name)}
+            aria-describedby={visibleErrors.name ? "enquiry-name-error" : undefined}
             placeholder="Your full name"
             className={inputClasses}
           />
-          <FieldError id="enquiry-name-error" message={errors.name} />
+          <FieldError id="enquiry-name-error" message={visibleErrors.name} />
         </div>
 
         <div>
@@ -152,12 +213,12 @@ export function ContactForm() {
             value={form.email}
             onChange={(event) => setField("email")(event.target.value)}
             onBlur={handleBlur("email")}
-            aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? "enquiry-email-error" : undefined}
+            aria-invalid={Boolean(visibleErrors.email)}
+            aria-describedby={visibleErrors.email ? "enquiry-email-error" : undefined}
             placeholder="you@company.com"
             className={inputClasses}
           />
-          <FieldError id="enquiry-email-error" message={errors.email} />
+          <FieldError id="enquiry-email-error" message={visibleErrors.email} />
         </div>
 
         <div>
@@ -172,12 +233,12 @@ export function ContactForm() {
             value={form.phone}
             onChange={(event) => setField("phone")(event.target.value)}
             onBlur={handleBlur("phone")}
-            aria-invalid={Boolean(errors.phone)}
-            aria-describedby={errors.phone ? "enquiry-phone-error" : undefined}
+            aria-invalid={Boolean(visibleErrors.phone)}
+            aria-describedby={visibleErrors.phone ? "enquiry-phone-error" : undefined}
             placeholder="+00 000 000 000"
             className={inputClasses}
           />
-          <FieldError id="enquiry-phone-error" message={errors.phone} />
+          <FieldError id="enquiry-phone-error" message={visibleErrors.phone} />
         </div>
 
         <div>
@@ -207,8 +268,8 @@ export function ContactForm() {
             value={form.category}
             onChange={(event) => setField("category")(event.target.value)}
             onBlur={handleBlur("category")}
-            aria-invalid={Boolean(errors.category)}
-            aria-describedby={errors.category ? "enquiry-category-error" : undefined}
+            aria-invalid={Boolean(visibleErrors.category)}
+            aria-describedby={visibleErrors.category ? "enquiry-category-error" : undefined}
             className={`${inputClasses} appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2212%22%20height%3D%228%22%3E%3Cpath%20d%3D%22M1%201l5%205%205-5%22%20stroke%3D%22%2323201a%22%20stroke-width%3D%222%22%20fill%3D%22none%22/%3E%3C/svg%3E')] bg-[position:right_1rem_center] bg-no-repeat pr-10 ${form.category ? "" : "text-ink/40"}`}
           >
             <option value="" disabled>
@@ -221,7 +282,7 @@ export function ContactForm() {
             ))}
             <option value="Other / Multiple">Other / Multiple</option>
           </select>
-          <FieldError id="enquiry-category-error" message={errors.category} />
+          <FieldError id="enquiry-category-error" message={visibleErrors.category} />
         </div>
 
         <div className="sm:col-span-2">
@@ -236,19 +297,19 @@ export function ContactForm() {
             value={form.message}
             onChange={(event) => setField("message")(event.target.value)}
             onBlur={handleBlur("message")}
-            aria-invalid={Boolean(errors.message)}
+            aria-invalid={Boolean(visibleErrors.message)}
             aria-describedby={
-              errors.message ? "enquiry-message-error" : "enquiry-message-hint"
+              visibleErrors.message ? "enquiry-message-error" : "enquiry-message-hint"
             }
             placeholder="Construction, composition, weight (GSM), width, quantity and target delivery window — as much detail as you have."
             className={`${inputClasses} resize-y`}
           />
-          {!errors.message && (
+          {!visibleErrors.message && (
             <p id="enquiry-message-hint" className="mt-1.5 text-xs text-ink/45">
               The more specific your brief, the faster our first proposal.
             </p>
           )}
-          <FieldError id="enquiry-message-error" message={errors.message} />
+          <FieldError id="enquiry-message-error" message={visibleErrors.message} />
         </div>
       </div>
 
