@@ -11,8 +11,13 @@ const aboutPoints = [
   {
     id: "network",
     title: "A sourcing network built on standards",
-    description:
-      "Mills and suppliers are selected to match your construction, weight and finish targets — then held to them.",
+    description: (
+      <>
+        Mills and suppliers are selected to match your construction,
+        <br />
+        weight and finish targets — then held to them.
+      </>
+    ),
   },
   {
     id: "development",
@@ -24,13 +29,17 @@ const aboutPoints = [
     id: "relationship",
     title: "Built for new and current buyers",
     description:
-      "Transparent costing and dependable timelines for buyers who reorder season after season.",
+      "Transparent costing and dependable timelines for new and current buyers who reorder season after season.",
   },
 ];
 
 export function AboutSection() {
   return (
-    <section id="about" className="bg-paper py-24 sm:py-32" aria-labelledby="about-heading">
+    <section
+      id="about"
+      className="bg-paper py-24 sm:py-32"
+      aria-labelledby="about-heading"
+    >
       <Container>
         <div className="grid gap-16 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-5">
@@ -41,16 +50,25 @@ export function AboutSection() {
                   <span id="about-heading">
                     Fabric first.
                     <br />
-                    <span className="italic text-clay">Partnership always.</span>
+                    <span className="italic text-clay">
+                      Partnership always.
+                    </span>
                   </span>
                 }
                 lead="Twisttex International exists to make fabric the strongest part of your product — not the riskiest. We work between buyers and mills with one accountability: what was approved is what ships."
               />
               <RevealGroup className="mt-9 space-y-6">
                 {aboutPoints.map((point) => (
-                  <RevealItem key={point.id} className="border-l-2 border-sand pl-5">
-                    <h3 className="text-sm font-bold tracking-wide">{point.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-ink/65">{point.description}</p>
+                  <RevealItem
+                    key={point.id}
+                    className="border-l-2 border-sand pl-5"
+                  >
+                    <h3 className="text-sm font-bold tracking-wide">
+                      {point.title}
+                    </h3>
+                    <p className="mt-1 text-sm leading-relaxed text-ink/65">
+                      {point.description}
+                    </p>
                   </RevealItem>
                 ))}
               </RevealGroup>
@@ -65,7 +83,11 @@ export function AboutSection() {
                   src="/images/about-mill.jpg"
                   alt="Fabric rolls at a partner mill"
                   pattern="plain"
-                  palette={{ base: "#EAE2CF", warp: "#F6F1E3", weft: "#D9CDB2" }}
+                  palette={{
+                    base: "#EAE2CF",
+                    warp: "#F6F1E3",
+                    weft: "#D9CDB2",
+                  }}
                   className="aspect-[4/3] w-full rounded-xl"
                 />
               </figure>
@@ -79,7 +101,11 @@ export function AboutSection() {
                   src="/images/about-fabric-closeup.jpg"
                   alt="Close-up of fabric texture"
                   pattern="twill"
-                  palette={{ base: "#33475E", warp: "#42586F", weft: "#232F3E" }}
+                  palette={{
+                    base: "#33475E",
+                    warp: "#42586F",
+                    weft: "#232F3E",
+                  }}
                   className="aspect-square w-full rounded-lg"
                 />
               </motion.figure>
@@ -101,7 +127,10 @@ export function AboutSection() {
               className="group mt-10 inline-flex items-center gap-2.5 text-sm font-bold uppercase tracking-[0.16em] text-clay transition-colors hover:text-clay-deep sm:ml-auto sm:flex"
             >
               See what we source
-              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
+              <ArrowRight
+                className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+                strokeWidth={2}
+              />
             </button>
           </div>
         </div>
