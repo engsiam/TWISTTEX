@@ -1,9 +1,14 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, LoaderCircle, RotateCcw, TriangleAlert } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { submitEnquiry } from "../../lib/api";
-import { validateEnquiry } from "./validation";
+import {
+  ENQUIRY_LIMITS,
+  sanitizeEnquiry,
+  truncateForDisplay,
+  validateEnquiry,
+} from "./validation";
 import type { EnquiryFormData, EnquiryFormErrors } from "../../types";
 import { fabricCategories } from "../../data/products";
 
@@ -40,6 +45,11 @@ export function ContactForm() {
     Partial<Record<keyof EnquiryFormData, boolean>>
   >({});
   const [status, setStatus] = useState<FormStatus>("idle");
+  // Honeypot for bots — real users never fill this. Kept out of
+  // EnquiryFormData so it is never sent to the API.
+  const [website, setWebsite] = useState("");
+  // Client-side spam throttle: ignore submits within 5s of the last attempt.
+  const lastSubmitRef = useRef(0);
 
   const isPending = status === "submitting";
 
@@ -78,7 +88,13 @@ export function ContactForm() {
     event.preventDefault();
     if (status === "submitting") return;
 
-    const nextErrors = validateEnquiry(form);
+    // Throttle rapid re-submits (bots / double-clicks).
+    const now = Date.now();
+    if (now - lastSubmitRef.current < 5000 && status === "error") return;
+    lastSubmitRef.current = now;
+
+    const clean = sanitizeEnquiry(form);
+    const nextErrors = validateEnquiry(clean);
     setErrors(nextErrors);
     // Mark every field as touched so all relevant errors appear after
     // an invalid submit.
@@ -113,7 +129,14 @@ export function ContactForm() {
     }
 
     setStatus("submitting");
-    submitEnquiry(form)
+    // Honeypot hit → pretend success without a network request so bots
+    // get no signal. Never send the honeypot value anywhere.
+    if (website.trim()) {
+      window.setTimeout(() => setStatus("success"), 600);
+      return;
+    }
+    setForm(clean);
+    submitEnquiry(clean)
       .then(() => setStatus("success"))
       .catch(() => setStatus("error"));
   };
@@ -123,9 +146,14 @@ export function ContactForm() {
     setErrors({});
     setTouched({});
     setStatus("idle");
+    setWebsite("");
+    lastSubmitRef.current = 0;
   };
 
   if (status === "success") {
+    const displayName =
+      truncateForDisplay(form.name.split(/\s+/)[0] || "", 40) || "there";
+    const displayEmail = truncateForDisplay(form.email, 60);
     return (
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -135,9 +163,9 @@ export function ContactForm() {
       >
         <CheckCircle2 className="size-14 text-clay" strokeWidth={1.5} />
         <h3 className="mt-6 font-display text-3xl font-medium">Enquiry received.</h3>
-        <p className="mt-3 max-w-sm text-sm leading-relaxed text-ink/65">
-          Thank you, {form.name.split(" ")[0] || "there"}. Our sourcing team will review
-          your requirement and reply to <strong>{form.email}</strong> shortly.
+        <p className="mt-3 max-w-sm text-sm leading-relaxed break-words text-ink/65">
+          Thank you, {displayName}. Our sourcing team will review
+          your requirement and reply to <strong>{displayEmail}</strong> shortly.
         </p>
         <Button variant="outlineLight" className="mt-8" onClick={handleReset}>
           <RotateCcw className="size-3.5" strokeWidth={2.25} />
@@ -173,6 +201,7 @@ export function ContactForm() {
             type="text"
             autoComplete="name"
             required
+            maxLength={ENQUIRY_LIMITS.name.max}
             value={form.name}
             onChange={(event) => setField("name")(event.target.value)}
             onBlur={handleBlur("name")}
@@ -193,6 +222,7 @@ export function ContactForm() {
             name="company"
             type="text"
             autoComplete="organization"
+            maxLength={ENQUIRY_LIMITS.company.max}
             value={form.company}
             onChange={(event) => setField("company")(event.target.value)}
             placeholder="Company / brand"
@@ -210,6 +240,7 @@ export function ContactForm() {
             type="email"
             autoComplete="email"
             required
+            maxLength={ENQUIRY_LIMITS.email.max}
             value={form.email}
             onChange={(event) => setField("email")(event.target.value)}
             onBlur={handleBlur("email")}
@@ -230,6 +261,7 @@ export function ContactForm() {
             name="phone"
             type="tel"
             autoComplete="tel"
+            maxLength={ENQUIRY_LIMITS.phone.max}
             value={form.phone}
             onChange={(event) => setField("phone")(event.target.value)}
             onBlur={handleBlur("phone")}
@@ -250,6 +282,7 @@ export function ContactForm() {
             name="country"
             type="text"
             autoComplete="country-name"
+            maxLength={ENQUIRY_LIMITS.country.max}
             value={form.country}
             onChange={(event) => setField("country")(event.target.value)}
             placeholder="Where should we ship?"
@@ -294,6 +327,7 @@ export function ContactForm() {
             name="message"
             required
             rows={5}
+            maxLength={ENQUIRY_LIMITS.message.max}
             value={form.message}
             onChange={(event) => setField("message")(event.target.value)}
             onBlur={handleBlur("message")}
@@ -311,6 +345,20 @@ export function ContactForm() {
           )}
           <FieldError id="enquiry-message-error" message={visibleErrors.message} />
         </div>
+      </div>
+
+      {/* Honeypot anti-spam: hidden from users, bots fill it. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <label htmlFor="enquiry-website">Website</label>
+        <input
+          id="enquiry-website"
+          name="website"
+          type="text"
+          autoComplete="off"
+          tabIndex={-1}
+          value={website}
+          onChange={(event) => setWebsite(event.target.value)}
+        />
       </div>
 
       <AnimatePresence>
